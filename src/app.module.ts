@@ -5,6 +5,7 @@ import { AmqpModule } from './amqp/amqp.module';
 import { AppController } from './app.controller';
 import { UsersModule } from './users/users.module';
 import { StoresModule } from './stores/stores.module';
+import { ProductsModule } from './products/products.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { StoresModule } from './stores/stores.module';
     AmqpModule,
     UsersModule,
     StoresModule,
+    ProductsModule,
   ],
   controllers: [AppController],
 })
