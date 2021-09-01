@@ -1,9 +1,9 @@
 import { User } from '../entities/user.entity';
 
 export class UserDto {
-  id!: number;
+  id: number;
 
-  name!: string;
+  name: string;
 
   constructor(user: User) {
     this.id = user.id;
