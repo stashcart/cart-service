@@ -1,7 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsBoolean,
-  IsDefined,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -9,16 +8,14 @@ import {
 } from 'class-validator';
 
 export class CreateCartRequestDto {
-  @IsDefined()
+  @IsNumber()
   carterId: number;
 
   @ApiProperty({ example: 'My cart' })
-  @IsDefined()
   @IsNotEmpty()
   @IsString()
   title: string;
 
-  @IsDefined()
   @IsNumber()
   storeId: number;
 

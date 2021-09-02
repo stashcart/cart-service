@@ -9,7 +9,7 @@ export class AddCartProductRequestDto {
   @IsDefined()
   productUrl: string;
 
-  @IsDefined()
+  @IsNumber()
   @Min(1)
   amount: number;
 }
