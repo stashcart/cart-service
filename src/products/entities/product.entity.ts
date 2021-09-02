@@ -12,8 +12,8 @@ export class Product {
   @Column({ nullable: true })
   price: number | null;
 
-  @Column()
-  name: string;
+  @Column({ nullable: true })
+  name: string | null;
 
   @ManyToOne(() => Store, { eager: true })
   store: Store;
