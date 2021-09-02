@@ -1,7 +1,8 @@
-import { IsDefined, IsUrl } from 'class-validator';
+import { IsDefined, IsNumber, IsUrl, Min } from 'class-validator';
 
 export class AddCartProductRequestDto {
   @IsDefined()
+  @IsNumber()
   customerId: number;
 
   @IsUrl()
@@ -9,5 +10,6 @@ export class AddCartProductRequestDto {
   productUrl: string;
 
   @IsDefined()
+  @Min(1)
   amount: number;
 }

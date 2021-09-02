@@ -1,12 +1,12 @@
-import { IsDefined, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class PatchCartRequestDto {
-  @IsDefined()
   @IsOptional()
   @IsNotEmpty()
+  @IsString()
   title?: string;
 
-  @IsDefined()
   @IsOptional()
+  @IsBoolean()
   isAutoApproveEnabled?: boolean;
 }

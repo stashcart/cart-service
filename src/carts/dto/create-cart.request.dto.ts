@@ -1,5 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDefined, IsNotEmpty, IsOptional } from 'class-validator';
+import {
+  IsBoolean,
+  IsDefined,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class CreateCartRequestDto {
   @IsDefined()
@@ -8,12 +15,14 @@ export class CreateCartRequestDto {
   @ApiProperty({ example: 'My cart' })
   @IsDefined()
   @IsNotEmpty()
+  @IsString()
   title: string;
 
   @IsDefined()
+  @IsNumber()
   storeId: number;
 
   @IsOptional()
-  @IsDefined()
+  @IsBoolean()
   isAutoApproveEnabled?: boolean;
 }
