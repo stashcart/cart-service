@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { CreateStoreRequestDto } from './dto/create-store.request.dto';
 import { StoreDto } from './dto/store.dto';
@@ -13,6 +13,12 @@ export class StoresController {
   async findAll(): Promise<StoreDto[]> {
     const stores = await this.storesService.findAll();
     return stores.map((store) => new StoreDto(store));
+  }
+
+  @Get(':id')
+  async findById(@Param('id') id: number): Promise<StoreDto> {
+    const store = await this.storesService.findById(id);
+    return new StoreDto(store);
   }
 
   @Post()
