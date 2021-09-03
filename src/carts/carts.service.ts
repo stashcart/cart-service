@@ -1,5 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { ProductsService } from 'src/products/products.service';
+import { StoresService } from 'src/stores/stores.service';
+import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
 import { CartProduct } from './entities/cart-product.entity';
 import { Cart } from './entities/cart.entity';
@@ -7,20 +10,30 @@ import { Cart } from './entities/cart.entity';
 @Injectable()
 export class CartsService {
   constructor(
+    @InjectRepository(Cart)
     private readonly cartsRepository: Repository<Cart>,
-    private readonly cartProductsRepository: Repository<CartProduct>
+    @InjectRepository(CartProduct)
+    private readonly cartProductsRepository: Repository<CartProduct>,
+    private readonly usersService: UsersService,
+    private readonly storesService: StoresService,
+    private readonly productsService: ProductsService
   ) {}
 
-  findAllCarts(): Promise<Cart[]> {
-    throw new Error('Method not implemented.');
+  findOpenedCarts(): Promise<Cart[]> {
+    return this.cartsRepository.find({ where: { isClosed: false } });
   }
 
-  // TODO: Remove eslint rule on the top of file
-  findCartById(id: number): Promise<Cart> {
-    throw new Error('Method not implemented.');
+  async findCartById(id: number): Promise<Cart> {
+    const cart = this.cartsRepository.findOne(id);
+
+    if (!cart) {
+      throw new NotFoundException(`Cart: ${id}`);
+    }
+
+    return cart;
   }
 
-  createCart({
+  async createCart({
     carterId,
     title,
     storeId,
@@ -31,10 +44,17 @@ export class CartsService {
     storeId: number;
     isAutoApproveEnabled?: boolean;
   }): Promise<Cart> {
-    throw new Error('Method not implemented.');
+    const cart = new Cart();
+
+    cart.title = title;
+    cart.isAutoApproveEnabled = isAutoApproveEnabled ?? false;
+    cart.carter = await this.usersService.findById(carterId);
+    cart.store = await this.storesService.findById(storeId);
+
+    return this.cartsRepository.save(cart);
   }
 
-  patchCart({
+  async patchCart({
     id,
     title,
     isAutoApproveEnabled,
@@ -43,28 +63,51 @@ export class CartsService {
     title?: string;
     isAutoApproveEnabled?: boolean;
   }): Promise<Cart> {
-    throw new Error('Method not implemented.');
+    const cart = await this.findCartById(id);
+
+    cart.title = title;
+    cart.isAutoApproveEnabled = isAutoApproveEnabled;
+
+    return this.cartsRepository.save(cart);
   }
 
-  closeCart(id: number): Promise<void> {
-    throw new Error('Method not implemented.');
+  async closeCart(id: number): Promise<void> {
+    const cart = await this.findCartById(id);
+
+    cart.isClosed = true;
+
+    await this.cartsRepository.save(cart);
   }
 
-  addProductToCart({
-    id,
+  async addProductToCart({
+    cartId,
     customerId,
     productUrl,
     amount,
   }: {
-    id: number;
+    cartId: number;
     customerId: number;
     productUrl: string;
     amount: number;
   }): Promise<CartProduct> {
-    throw new Error('Method not implemented.');
+    const cartProduct = new CartProduct();
+
+    cartProduct.amount = amount;
+    cartProduct.cart = await this.findCartById(cartId);
+    cartProduct.customer = await this.usersService.findById(customerId);
+    cartProduct.product =
+      await this.productsService.findOrCreateByUrlAndStoreId(productUrl);
+
+    return this.cartProductsRepository.save(cartProduct);
   }
 
-  deleteProductFromCart(cartId: number, productId: number): Promise<void> {
-    throw new Error('Method not implemented.');
+  async deleteProductFromCart(
+    cartId: number,
+    productId: number
+  ): Promise<void> {
+    await this.cartProductsRepository.delete({
+      cart: { id: cartId },
+      product: { id: productId },
+    });
   }
 }

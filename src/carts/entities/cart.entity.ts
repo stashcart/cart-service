@@ -33,6 +33,6 @@ export class Cart {
   @Column({ name: 'is_auto_approve_enabled', default: false })
   isAutoApproveEnabled: boolean;
 
-  @Column({ name: 'is_closed ' })
+  @Column({ name: 'is_closed', default: false })
   isClosed: boolean;
 }

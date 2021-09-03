@@ -22,7 +22,7 @@ export class CartsController {
 
   @Get()
   async findAllCarts(): Promise<CartDto[]> {
-    const carts = await this.cartsService.findAllCarts();
+    const carts = await this.cartsService.findOpenedCarts();
     return carts.map((cart) => new CartDto(cart));
   }
 
@@ -64,7 +64,7 @@ export class CartsController {
   ): Promise<CartProductDto> {
     const cartProduct = await this.cartsService.addProductToCart({
       ...addCartProductRequestDto,
-      id: cartId,
+      cartId,
     });
     return new CartProductDto(cartProduct);
   }
