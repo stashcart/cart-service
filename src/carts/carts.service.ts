@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { isDefined } from 'class-validator';
 import { ProductsService } from 'src/products/products.service';
 import { StoresService } from 'src/stores/stores.service';
 import { UsersService } from 'src/users/users.service';
@@ -65,8 +66,12 @@ export class CartsService {
   }): Promise<Cart> {
     const cart = await this.findCartById(id);
 
-    cart.title = title;
-    cart.isAutoApproveEnabled = isAutoApproveEnabled;
+    if (isDefined(title)) {
+      cart.title = title;
+    }
+    if (isDefined(isAutoApproveEnabled)) {
+      cart.isAutoApproveEnabled = isAutoApproveEnabled;
+    }
 
     return this.cartsRepository.save(cart);
   }
@@ -91,12 +96,18 @@ export class CartsService {
     amount: number;
   }): Promise<CartProduct> {
     const cartProduct = new CartProduct();
+    const cart = await this.findCartById(cartId);
+
+    // TODO: Check if have product url related to the store
 
     cartProduct.amount = amount;
-    cartProduct.cart = await this.findCartById(cartId);
+    cartProduct.cart = cart;
     cartProduct.customer = await this.usersService.findById(customerId);
     cartProduct.product =
-      await this.productsService.findOrCreateByUrlAndStoreId(productUrl);
+      await this.productsService.findOrCreateByUrlAndStoreId(
+        productUrl,
+        cart.store.id
+      );
 
     return this.cartProductsRepository.save(cartProduct);
   }

@@ -19,15 +19,15 @@ export class Cart {
   @Column()
   title: string;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { eager: true })
   @JoinColumn({ name: 'carter_id' })
   carter: User;
 
-  @ManyToOne(() => Store)
+  @ManyToOne(() => Store, { eager: true })
   @JoinColumn({ name: 'store_id' })
   store: Store;
 
-  @OneToMany(() => CartProduct, (cp) => cp.product)
+  @OneToMany(() => CartProduct, (cp) => cp.product, { eager: true })
   products: CartProduct[];
 
   @Column({ name: 'is_auto_approve_enabled', default: false })
