@@ -22,13 +22,13 @@ export class CartsController {
 
   @Get()
   async findAllCarts(): Promise<CartDto[]> {
-    const carts = await this.cartsService.findOpenedCarts();
+    const carts = await this.cartsService.findOpenedCartsWithProducts();
     return carts.map((cart) => new CartDto(cart));
   }
 
   @Get(':id')
   async findCartById(@Param('id') id): Promise<CartDto> {
-    const cart = await this.cartsService.findCartById(id);
+    const cart = await this.cartsService.findCartByIdWithProducts(id);
     return new CartDto(cart);
   }
 

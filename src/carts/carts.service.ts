@@ -24,12 +24,25 @@ export class CartsService {
     private readonly productsService: ProductsService
   ) {}
 
-  findOpenedCarts(): Promise<Cart[]> {
-    return this.cartsRepository.find({ where: { isClosed: false } });
+  findOpenedCartsWithProducts(): Promise<Cart[]> {
+    return this.cartsRepository.find({
+      where: { isClosed: false },
+      relations: ['products'],
+    });
+  }
+
+  async findCartByIdWithProducts(id: number): Promise<Cart> {
+    const cart = this.cartsRepository.findOne(id);
+
+    if (!cart) {
+      throw new NotFoundException(`Cart: ${id}`);
+    }
+
+    return cart;
   }
 
   async findCartById(id: number): Promise<Cart> {
-    const cart = this.cartsRepository.findOne(id);
+    const cart = this.cartsRepository.findOne(id, { relations: ['products'] });
 
     if (!cart) {
       throw new NotFoundException(`Cart: ${id}`);
@@ -68,7 +81,7 @@ export class CartsService {
     title?: string;
     isAutoApproveEnabled?: boolean;
   }): Promise<Cart> {
-    const cart = await this.findCartById(id);
+    const cart = await this.findCartByIdWithProducts(id);
 
     if (isDefined(title)) {
       cart.title = title;

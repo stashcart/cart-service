@@ -27,7 +27,7 @@ export class Cart {
   @JoinColumn({ name: 'store_id' })
   store: Store;
 
-  @OneToMany(() => CartProduct, (cp) => cp.product, { eager: true })
+  @OneToMany(() => CartProduct, (cp) => cp.product)
   products: CartProduct[];
 
   @Column({ name: 'is_auto_approve_enabled', default: false })
