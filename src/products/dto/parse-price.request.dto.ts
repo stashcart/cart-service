@@ -1,4 +1,3 @@
-import { StoreDto } from 'src/stores/dto/store.dto';
 import { Product } from '../entities/product.entity';
 
 export class ParsePriceRequestDto {
@@ -6,11 +5,11 @@ export class ParsePriceRequestDto {
 
   url: string;
 
-  store: StoreDto;
+  storeName: string;
 
   constructor(product: Product) {
     this.id = product.id;
     this.url = product.url;
-    this.store = new StoreDto(product.store);
+    this.storeName = product.store.name;
   }
 }
