@@ -1,5 +1,11 @@
 import { Store } from 'src/stores/entities/store.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity('products')
 export class Product {
@@ -16,5 +22,6 @@ export class Product {
   name: string | null;
 
   @ManyToOne(() => Store, { eager: true })
+  @JoinColumn({ name: 'store_id' })
   store: Store;
 }
