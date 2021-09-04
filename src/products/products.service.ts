@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { isDefined } from 'class-validator';
 import { AmqpService } from 'src/amqp/amqp.service';
 import { StoresService } from 'src/stores/stores.service';
 import { Repository } from 'typeorm';
@@ -41,23 +42,44 @@ export class ProductsService {
     product.url = url;
     product.store = await this.storeService.findById(storeId);
 
-    const savedProduct = await this.productsRepository.save(product);
-
-    await this.amqpService.publish(
-      'product',
-      'parse',
-      new ParsePriceRequestDto(savedProduct)
-    );
-
-    return savedProduct;
+    return this.productsRepository.save(product);
   }
 
   async findOrCreateByUrlAndStoreId(
     url: string,
     storeId: number
   ): Promise<Product> {
-    const product = await this.findByUrl(url);
+    const product =
+      (await this.findByUrl(url)) ??
+      (await this.createFromUrlAndStoreId(url, storeId));
 
-    return product ?? this.createFromUrlAndStoreId(url, storeId);
+    await this.amqpService.publish(
+      'product',
+      'parse',
+      new ParsePriceRequestDto(product)
+    );
+
+    return product;
+  }
+
+  async patch({
+    id,
+    price,
+    name,
+  }: {
+    id: number;
+    price?: number;
+    name?: string;
+  }): Promise<Product> {
+    const product = await this.findById(id);
+
+    if (isDefined(product.price)) {
+      product.price = price;
+    }
+    if (isDefined(product.name)) {
+      product.name = name;
+    }
+
+    return this.productsRepository.save(product);
   }
 }

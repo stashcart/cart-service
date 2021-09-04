@@ -1,5 +1,6 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { PatchProductRequestDto } from './dto/patch-product.request.dto';
 import { ProductDto } from './dto/product.dto';
 import { ProductsService } from './products.service';
 
@@ -17,6 +18,18 @@ export class ProductsController {
   @Get(':id')
   async findById(@Param('id') id: number): Promise<ProductDto> {
     const product = await this.productsService.findById(id);
+    return new ProductDto(product);
+  }
+
+  @Patch(':id')
+  async patch(
+    @Param('id') id: number,
+    @Body() patchProductRequestDto: PatchProductRequestDto
+  ): Promise<ProductDto> {
+    const product = await this.productsService.patch({
+      id,
+      ...patchProductRequestDto,
+    });
     return new ProductDto(product);
   }
 }

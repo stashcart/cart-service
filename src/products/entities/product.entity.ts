@@ -6,7 +6,7 @@ export class Product {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ unique: true })
   url: string;
 
   @Column({ nullable: true })
