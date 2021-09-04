@@ -26,7 +26,6 @@ export class StoresController {
     @Body() createStoreRequestDto: CreateStoreRequestDto
   ): Promise<StoreDto> {
     const store = await this.storesService.create(createStoreRequestDto);
-
     return new StoreDto(store);
   }
 }

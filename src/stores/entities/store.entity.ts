@@ -7,4 +7,7 @@ export class Store {
 
   @Column({ unique: true })
   name: string;
+
+  @Column({ unique: true })
+  url: string;
 }

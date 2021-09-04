@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { isDefined } from 'class-validator';
 import { ProductsService } from 'src/products/products.service';
@@ -98,7 +102,9 @@ export class CartsService {
     const cartProduct = new CartProduct();
     const cart = await this.findCartById(cartId);
 
-    // TODO: Check if have product url related to the store
+    if (!this.validateProductUrl(productUrl, cart.store.url)) {
+      throw new BadRequestException('Product not related to the store');
+    }
 
     cartProduct.amount = amount;
     cartProduct.cart = cart;
@@ -110,6 +116,10 @@ export class CartsService {
       );
 
     return this.cartProductsRepository.save(cartProduct);
+  }
+
+  private validateProductUrl(productUrl: string, storeUrl: string): boolean {
+    return productUrl.includes(storeUrl);
   }
 
   async deleteProductFromCart(
