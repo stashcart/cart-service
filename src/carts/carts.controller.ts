@@ -6,11 +6,14 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { CartsService } from './carts.service';
 import { AddCartProductRequestDto } from './dto/add-cart-product.request.dto';
 import { CartProductDto } from './dto/cart-product.dto';
+import { CartRequestQueryDto } from './dto/cart-request-query.dto';
+import { CartRequestDto } from './dto/cart-request.dto';
 import { CartDto } from './dto/cart.dto';
 import { CreateCartRequestDto } from './dto/create-cart.request.dto';
 import { PatchCartRequestDto } from './dto/patch-cart.request.dto';
@@ -76,4 +79,18 @@ export class CartsController {
   ): Promise<void> {
     return this.cartsService.deleteProductFromCart(cartId, productId);
   }
+
+  @Get(':cartId/requests')
+  async findCartRequests(
+    @Param('cartId') cartId: number,
+    @Query() { status }: CartRequestQueryDto
+  ): Promise<CartRequestDto[]> {
+    const requests = await this.cartsService.findAllRequestsByCartIdAndStatus(
+      cartId,
+      status
+    );
+    return requests.map((request) => new CartRequestDto(request));
+  }
+
+  // TODO: Create, approve, reject, remove
 }
