@@ -5,6 +5,7 @@ import { AmqpService } from 'src/amqp/amqp.service';
 import { StoresService } from 'src/stores/stores.service';
 import { Repository } from 'typeorm';
 import { ParsePriceRequestDto } from './dto/parse-price.request.dto';
+import { PatchProductRequestDto } from './dto/patch-product.request.dto';
 import { Product } from './entities/product.entity';
 
 @Injectable()
@@ -62,16 +63,11 @@ export class ProductsService {
     return product;
   }
 
-  async patch({
-    id,
-    price,
-    name,
-  }: {
-    id: number;
-    price?: number;
-    name?: string;
-  }): Promise<Product> {
-    const product = await this.findById(id);
+  async patch(
+    cartId: number,
+    { price, name }: PatchProductRequestDto
+  ): Promise<Product> {
+    const product = await this.findById(cartId);
 
     if (isDefined(product.price)) {
       product.price = price;

@@ -20,8 +20,8 @@ import { PatchCartRequestDto } from './dto/patch-cart.request.dto';
 export class CartsController {
   constructor(private readonly cartsService: CartsService) {}
 
-  @Get()
   // TODO: Add items status query
+  @Get()
   async findAllCarts(): Promise<CartDto[]> {
     const carts = await this.cartsService.findOpenedCartsWithItems();
     return carts.map((cart) => new CartDto(cart));
@@ -63,10 +63,10 @@ export class CartsController {
     @Param('cartId') cartId: number,
     @Body() addCartItemRequestDto: AddCartItemRequestDto
   ): Promise<CartItemDto> {
-    const item = await this.cartsService.addItemToCart({
-      ...addCartItemRequestDto,
+    const item = await this.cartsService.addItemToCart(
       cartId,
-    });
+      addCartItemRequestDto
+    );
     return new CartItemDto(item);
   }
 

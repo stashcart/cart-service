@@ -9,6 +9,8 @@ import { ProductsService } from 'src/products/products.service';
 import { StoresService } from 'src/stores/stores.service';
 import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
+import { AddCartItemRequestDto } from './dto/add-cart-item.request.dto';
+import { CreateCartRequestDto } from './dto/create-cart.request.dto';
 import { CartItem, CartItemStatus } from './entities/cart-item.entity';
 import { Cart } from './entities/cart.entity';
 
@@ -52,23 +54,13 @@ export class CartsService {
     return cart;
   }
 
-  async createCart({
-    ownerId,
-    title,
-    storeId,
-    isAutoApproveEnabled,
-  }: {
-    ownerId: string;
-    title: string;
-    storeId: number;
-    isAutoApproveEnabled?: boolean;
-  }): Promise<Cart> {
+  async createCart(createCartDto: CreateCartRequestDto): Promise<Cart> {
     const cart = new Cart();
 
-    cart.title = title;
-    cart.isAutoApproveEnabled = isAutoApproveEnabled ?? false;
-    cart.owner = await this.usersService.findById(ownerId);
-    cart.store = await this.storesService.findById(storeId);
+    cart.title = createCartDto.title;
+    cart.isAutoApproveEnabled = createCartDto.isAutoApproveEnabled ?? false;
+    cart.owner = await this.usersService.findById(createCartDto.ownerId);
+    cart.store = await this.storesService.findById(createCartDto.storeId);
 
     return this.cartsRepository.save(cart);
   }
@@ -104,17 +96,10 @@ export class CartsService {
     await this.cartsRepository.save(cart);
   }
 
-  async addItemToCart({
-    cartId,
-    customerId,
-    productUrl,
-    amount,
-  }: {
-    cartId: number;
-    customerId: string;
-    productUrl: string;
-    amount: number;
-  }): Promise<CartItem> {
+  async addItemToCart(
+    cartId: number,
+    { amount, customerId, productUrl }: AddCartItemRequestDto
+  ): Promise<CartItem> {
     const cartItem = new CartItem();
     const cart = await this.findCartById(cartId);
 
