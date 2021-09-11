@@ -23,7 +23,7 @@ export class UsersService {
     return this.usersRepository.find();
   }
 
-  async findById(id: number): Promise<User> {
+  async findById(id: string): Promise<User> {
     const user = await this.usersRepository.findOne(id);
 
     if (!user) {
@@ -31,5 +31,12 @@ export class UsersService {
     }
 
     return user;
+  }
+
+  create({ name }: { name: string }) {
+    const user = new User();
+    user.name = name;
+
+    return this.usersRepository.save(user);
   }
 }

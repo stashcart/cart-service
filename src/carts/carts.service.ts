@@ -58,7 +58,7 @@ export class CartsService {
     storeId,
     isAutoApproveEnabled,
   }: {
-    carterId: number;
+    carterId: string;
     title: string;
     storeId: number;
     isAutoApproveEnabled?: boolean;
@@ -111,7 +111,7 @@ export class CartsService {
     amount,
   }: {
     cartId: number;
-    customerId: number;
+    customerId: string;
     productUrl: string;
     amount: number;
   }): Promise<CartItem> {
@@ -143,7 +143,7 @@ export class CartsService {
     return productUrl.includes(storeUrl);
   }
 
-  private isCartOwner(cart: Cart, userId: number): boolean {
+  private isCartOwner(cart: Cart, userId: string): boolean {
     return cart.carter.id === userId;
   }
 

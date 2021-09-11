@@ -1,7 +1,7 @@
 import { User } from '../entities/user.entity';
 
 export class UserDto {
-  id: number;
+  id: string;
 
   name: string;
 

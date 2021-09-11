@@ -3,7 +3,7 @@ import { IsDefined, IsNumber, IsUrl, Min } from 'class-validator';
 export class AddCartItemRequestDto {
   @IsDefined()
   @IsNumber()
-  customerId: number;
+  customerId: string;
 
   @IsUrl()
   @IsDefined()
