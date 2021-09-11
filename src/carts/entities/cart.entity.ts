@@ -9,7 +9,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { CartProduct } from './cart-product.entity';
+import { CartItem } from './cart-item.entity';
 
 @Entity('carts')
 export class Cart {
@@ -27,8 +27,8 @@ export class Cart {
   @JoinColumn({ name: 'store_id' })
   store: Store;
 
-  @OneToMany(() => CartProduct, (cp) => cp.product)
-  products: CartProduct[];
+  @OneToMany(() => CartItem, (cp) => cp.product)
+  items: CartItem[];
 
   @Column({ name: 'is_auto_approve_enabled', default: false })
   isAutoApproveEnabled: boolean;

@@ -10,14 +10,14 @@ import {
 } from 'typeorm';
 import { Cart } from './cart.entity';
 
-export enum CartProductStatus {
+export enum CartItemStatus {
   PENDING = 'PENDING',
   APPROVED = 'APPROVED',
   REJECTED = 'REJECTED',
 }
 
-@Entity('cart_products')
-export class CartProduct {
+@Entity('cart_items')
+export class CartItem {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -34,10 +34,10 @@ export class CartProduct {
 
   @Column({
     type: 'enum',
-    enum: CartProductStatus,
-    default: CartProductStatus.PENDING,
+    enum: CartItemStatus,
+    default: CartItemStatus.PENDING,
   })
-  status: CartProductStatus;
+  status: CartItemStatus;
 
   @ManyToOne(() => Product, { eager: true })
   @JoinColumn({ name: 'product_id' })

@@ -9,7 +9,7 @@ import { ProductsService } from 'src/products/products.service';
 import { StoresService } from 'src/stores/stores.service';
 import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
-import { CartProduct, CartProductStatus } from './entities/cart-product.entity';
+import { CartItem, CartItemStatus } from './entities/cart-item.entity';
 import { Cart } from './entities/cart.entity';
 
 @Injectable()
@@ -17,22 +17,23 @@ export class CartsService {
   constructor(
     @InjectRepository(Cart)
     private readonly cartsRepository: Repository<Cart>,
-    @InjectRepository(CartProduct)
-    private readonly cartProductsRepository: Repository<CartProduct>,
+    @InjectRepository(CartItem)
+    private readonly cartItemsRepository: Repository<CartItem>,
     private readonly usersService: UsersService,
     private readonly storesService: StoresService,
     private readonly productsService: ProductsService
   ) {}
 
-  findOpenedCartsWithProducts(): Promise<Cart[]> {
+  // TODO: Add items status
+  findOpenedCartsWithItems(): Promise<Cart[]> {
     return this.cartsRepository.find({
       where: { isClosed: false },
-      relations: ['products'],
+      relations: ['items'],
     });
   }
 
-  async findCartByIdWithProducts(id: number): Promise<Cart> {
-    const cart = this.cartsRepository.findOne(id, { relations: ['products'] });
+  async findCartByIdWithItems(id: number): Promise<Cart> {
+    const cart = this.cartsRepository.findOne(id, { relations: ['items'] });
 
     if (!cart) {
       throw new NotFoundException(`Cart: ${id}`);
@@ -42,7 +43,7 @@ export class CartsService {
   }
 
   async findCartById(id: number): Promise<Cart> {
-    const cart = this.cartsRepository.findOne(id, { relations: ['products'] });
+    const cart = this.cartsRepository.findOne(id);
 
     if (!cart) {
       throw new NotFoundException(`Cart: ${id}`);
@@ -82,7 +83,7 @@ export class CartsService {
     title?: string;
     isAutoApproveEnabled?: boolean;
   }): Promise<Cart> {
-    const cart = await this.findCartByIdWithProducts(id);
+    const cart = await this.findCartByIdWithItems(id);
 
     if (isDefined(title)) {
       cart.title = title;
@@ -103,7 +104,7 @@ export class CartsService {
     await this.cartsRepository.save(cart);
   }
 
-  async addProductToCart({
+  async addItemToCart({
     cartId,
     customerId,
     productUrl,
@@ -113,30 +114,29 @@ export class CartsService {
     customerId: number;
     productUrl: string;
     amount: number;
-  }): Promise<CartProduct> {
-    const cartProduct = new CartProduct();
+  }): Promise<CartItem> {
+    const cartItem = new CartItem();
     const cart = await this.findCartById(cartId);
 
     if (!this.validateProductUrl(productUrl, cart.store.url)) {
       throw new BadRequestException('Product not related to the store');
     }
 
-    cartProduct.amount = amount;
-    cartProduct.cart = cart;
-    cartProduct.customer = await this.usersService.findById(customerId);
-    cartProduct.product =
-      await this.productsService.findOrCreateByUrlAndStoreId(
-        productUrl,
-        cart.store.id
-      );
+    cartItem.amount = amount;
+    cartItem.cart = cart;
+    cartItem.customer = await this.usersService.findById(customerId);
+    cartItem.product = await this.productsService.findOrCreateByUrlAndStoreId(
+      productUrl,
+      cart.store.id
+    );
 
     if (this.isCartOwner(cart, customerId) || cart.isAutoApproveEnabled) {
-      cartProduct.status = CartProductStatus.APPROVED;
+      cartItem.status = CartItemStatus.APPROVED;
     } else {
-      cartProduct.status = CartProductStatus.PENDING;
+      cartItem.status = CartItemStatus.PENDING;
     }
 
-    return this.cartProductsRepository.save(cartProduct);
+    return this.cartItemsRepository.save(cartItem);
   }
 
   private validateProductUrl(productUrl: string, storeUrl: string): boolean {
@@ -147,81 +147,62 @@ export class CartsService {
     return cart.carter.id === userId;
   }
 
-  async findAllCartProductsByCartIdAndStatus(
+  async findAllCartItemsByCartIdAndStatus(
     cartId: number,
-    status?: CartProductStatus
-  ): Promise<CartProduct[]> {
-    return this.cartProductsRepository.find({
+    status?: CartItemStatus
+  ): Promise<CartItem[]> {
+    return this.cartItemsRepository.find({
       cart: { id: cartId },
       status,
     });
   }
 
-  async findCartProductByIdAndCartId(
-    cartId: number,
-    cartProductId: number
-  ): Promise<CartProduct> {
-    const request = await this.cartProductsRepository.findOne({
-      id: cartProductId,
+  async findCartItemByIdAndCartId(
+    cartItemId: number,
+    cartId: number
+  ): Promise<CartItem> {
+    const item = await this.cartItemsRepository.findOne({
+      id: cartItemId,
       cart: { id: cartId },
     });
 
-    if (!request) {
+    if (!item) {
       throw new NotFoundException(
-        `CartProduct: id=${cartProductId}, cartId=${cartId}`
+        `CartItem: id=${cartItemId}, cartId=${cartId}`
       );
     }
 
-    return request;
+    return item;
   }
 
   // TODO: Add optional deleterId
-  async deleteProductFromCart(
-    cartId: number,
-    cartProductId: number
-  ): Promise<void> {
-    const cartProduct = await this.findCartProductByIdAndCartId(
-      cartId,
-      cartProductId
-    );
+  async deleteItemFromCart(cartId: number, cartItemId: number): Promise<void> {
+    const item = await this.findCartItemByIdAndCartId(cartItemId, cartId);
 
     if (
-      this.isCartOwner(cartProduct.cart, cartProduct.customer.id) ||
-      cartProduct.status !== CartProductStatus.PENDING
+      this.isCartOwner(item.cart, item.customer.id) ||
+      item.status !== CartItemStatus.PENDING
     ) {
-      throw new BadRequestException("Can't delete request");
+      throw new BadRequestException("Can't delete item");
     }
 
-    await this.cartProductsRepository.delete({
+    await this.cartItemsRepository.delete({
+      id: cartItemId,
       cart: { id: cartId },
-      product: { id: cartProductId },
     });
   }
 
   // TODO: Add optional ownerId
-  async approveCartProduct(
-    cartId: number,
-    cartProductId: number
-  ): Promise<CartProduct> {
-    const cartProduct = await this.findCartProductByIdAndCartId(
-      cartId,
-      cartProductId
-    );
-    cartProduct.status = CartProductStatus.APPROVED;
-
-    return this.cartProductsRepository.save(cartProduct);
+  async approveCartItem(cartId: number, cartItemId: number): Promise<CartItem> {
+    const item = await this.findCartItemByIdAndCartId(cartItemId, cartId);
+    item.status = CartItemStatus.APPROVED;
+    return this.cartItemsRepository.save(item);
   }
 
   // TODO: Add optional ownerId
-  async rejectCartRequest(
-    cartId: number,
-    cartProductId: number
-  ): Promise<CartProduct> {
-    const cartProducts = await this.findCartProductByIdAndCartId(
-      cartId,
-      cartProductId
-    );
-    cartProducts.status = CartProductStatus.REJECTED;
-    return this.cartProductsRepository.save(cartProducts);
+  async rejectCartItem(cartId: number, cartItemId: number): Promise<CartItem> {
+    const item = await this.findCartItemByIdAndCartId(cartItemId, cartId);
+    item.status = CartItemStatus.REJECTED;
+    return this.cartItemsRepository.save(item);
   }
 }

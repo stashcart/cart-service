@@ -9,8 +9,8 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { CartsService } from './carts.service';
-import { AddCartProductRequestDto } from './dto/add-cart-product.request.dto';
-import { CartProductDto } from './dto/cart-product.dto';
+import { AddCartItemRequestDto } from './dto/add-cart-item.request.dto';
+import { CartItemDto } from './dto/cart-item.dto';
 import { CartDto } from './dto/cart.dto';
 import { CreateCartRequestDto } from './dto/create-cart.request.dto';
 import { PatchCartRequestDto } from './dto/patch-cart.request.dto';
@@ -21,14 +21,15 @@ export class CartsController {
   constructor(private readonly cartsService: CartsService) {}
 
   @Get()
+  // TODO: Add items status query
   async findAllCarts(): Promise<CartDto[]> {
-    const carts = await this.cartsService.findOpenedCartsWithProducts();
+    const carts = await this.cartsService.findOpenedCartsWithItems();
     return carts.map((cart) => new CartDto(cart));
   }
 
   @Get(':id')
   async findCartById(@Param('id') id): Promise<CartDto> {
-    const cart = await this.cartsService.findCartByIdWithProducts(id);
+    const cart = await this.cartsService.findCartByIdWithItems(id);
     return new CartDto(cart);
   }
 
@@ -57,25 +58,25 @@ export class CartsController {
     return this.cartsService.closeCart(id);
   }
 
-  @Post(':cartId/cart-products')
-  async addProduct(
+  @Post(':cartId/items')
+  async addItem(
     @Param('cartId') cartId: number,
-    @Body() addCartProductRequestDto: AddCartProductRequestDto
-  ): Promise<CartProductDto> {
-    const cartProduct = await this.cartsService.addProductToCart({
-      ...addCartProductRequestDto,
+    @Body() addCartItemRequestDto: AddCartItemRequestDto
+  ): Promise<CartItemDto> {
+    const item = await this.cartsService.addItemToCart({
+      ...addCartItemRequestDto,
       cartId,
     });
-    return new CartProductDto(cartProduct);
+    return new CartItemDto(item);
   }
 
-  @Delete(':cartId/cart-products/:productId')
-  deleteProductFromCart(
+  @Delete(':cartId/items/:itemId')
+  deleteItemFromCart(
     @Param('cartId') cartId: number,
-    @Param('productId') productId: number
+    @Param('itemId') itemId: number
   ): Promise<void> {
-    return this.cartsService.deleteProductFromCart(cartId, productId);
+    return this.cartsService.deleteItemFromCart(cartId, itemId);
   }
 
-  // TODO: approve, reject
+  // TODO: findAllPendingItems, approve, reject
 }

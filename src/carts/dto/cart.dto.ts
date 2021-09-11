@@ -1,6 +1,6 @@
 import { UserDto } from 'src/users/dto/user.dto';
 import { Cart } from '../entities/cart.entity';
-import { CartProductDto } from './cart-product.dto';
+import { CartItemDto } from './cart-item.dto';
 
 export class CartDto {
   id: number;
@@ -13,7 +13,7 @@ export class CartDto {
 
   isAutoApproveEnabled: boolean;
 
-  products: CartProductDto[];
+  items: CartItemDto[];
 
   constructor(cart: Cart) {
     this.id = cart.id;
@@ -21,6 +21,6 @@ export class CartDto {
     this.carter = new UserDto(cart.carter);
     this.storeName = cart.store.name;
     this.isAutoApproveEnabled = cart.isAutoApproveEnabled;
-    this.products = cart.products.map((product) => new CartProductDto(product));
+    this.items = cart.items.map((item) => new CartItemDto(item));
   }
 }

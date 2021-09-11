@@ -1,6 +1,6 @@
 import { IsDefined, IsNumber, IsUrl, Min } from 'class-validator';
 
-export class AddCartProductRequestDto {
+export class AddCartItemRequestDto {
   @IsDefined()
   @IsNumber()
   customerId: number;
