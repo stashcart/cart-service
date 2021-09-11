@@ -20,8 +20,8 @@ export class Cart {
   title: string;
 
   @ManyToOne(() => User, { eager: true })
-  @JoinColumn({ name: 'carter_id' })
-  carter: User;
+  @JoinColumn({ name: 'owner_id' })
+  owner: User;
 
   @ManyToOne(() => Store, { eager: true })
   @JoinColumn({ name: 'store_id' })

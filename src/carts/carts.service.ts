@@ -53,12 +53,12 @@ export class CartsService {
   }
 
   async createCart({
-    carterId,
+    ownerId,
     title,
     storeId,
     isAutoApproveEnabled,
   }: {
-    carterId: string;
+    ownerId: string;
     title: string;
     storeId: number;
     isAutoApproveEnabled?: boolean;
@@ -67,7 +67,7 @@ export class CartsService {
 
     cart.title = title;
     cart.isAutoApproveEnabled = isAutoApproveEnabled ?? false;
-    cart.carter = await this.usersService.findById(carterId);
+    cart.owner = await this.usersService.findById(ownerId);
     cart.store = await this.storesService.findById(storeId);
 
     return this.cartsRepository.save(cart);
@@ -144,7 +144,7 @@ export class CartsService {
   }
 
   private isCartOwner(cart: Cart, userId: string): boolean {
-    return cart.carter.id === userId;
+    return cart.owner.id === userId;
   }
 
   async findAllCartItemsByCartIdAndStatus(

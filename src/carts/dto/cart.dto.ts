@@ -7,7 +7,7 @@ export class CartDto {
 
   title: string;
 
-  carter: UserDto;
+  owner: UserDto;
 
   storeName: string;
 
@@ -18,7 +18,7 @@ export class CartDto {
   constructor(cart: Cart) {
     this.id = cart.id;
     this.title = cart.title;
-    this.carter = new UserDto(cart.carter);
+    this.owner = new UserDto(cart.owner);
     this.storeName = cart.store.name;
     this.isAutoApproveEnabled = cart.isAutoApproveEnabled;
     this.items = cart.items.map((item) => new CartItemDto(item));

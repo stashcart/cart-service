@@ -9,7 +9,7 @@ import {
 
 export class CreateCartRequestDto {
   @IsNumber()
-  carterId: number;
+  ownerId: number;
 
   @ApiProperty({ example: 'My cart' })
   @IsNotEmpty()
