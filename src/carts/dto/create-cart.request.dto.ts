@@ -5,10 +5,11 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  IsUUID,
 } from 'class-validator';
 
 export class CreateCartRequestDto {
-  @IsNumber()
+  @IsUUID()
   ownerId: string;
 
   @ApiProperty({ example: 'My cart' })
@@ -19,6 +20,7 @@ export class CreateCartRequestDto {
   @IsNumber()
   storeId: number;
 
+  @ApiProperty({ example: false })
   @IsOptional()
   @IsBoolean()
   isAutoApproveEnabled?: boolean;
