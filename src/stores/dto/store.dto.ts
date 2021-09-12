@@ -5,8 +5,11 @@ export class StoreDto {
 
   name: string;
 
+  url: string;
+
   constructor(store: Store) {
     this.id = store.id;
     this.name = store.name;
+    this.url = store.url;
   }
 }

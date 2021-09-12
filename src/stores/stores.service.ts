@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { CreateStoreRequestDto } from './dto/create-store.request.dto';
 import { Store } from './entities/store.entity';
 
 @Injectable()
@@ -10,7 +11,7 @@ export class StoresService {
     private readonly storesRepository: Repository<Store>
   ) {}
 
-  async create({ name, url }: { name: string; url: string }): Promise<Store> {
+  async create({ name, url }: CreateStoreRequestDto): Promise<Store> {
     const store = new Store();
     store.name = name;
     store.url = url;
@@ -30,5 +31,9 @@ export class StoresService {
     }
 
     return store;
+  }
+
+  async deleteById(id: number): Promise<void> {
+    await this.storesRepository.delete(id);
   }
 }

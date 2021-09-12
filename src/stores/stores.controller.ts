@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { CreateStoreRequestDto } from './dto/create-store.request.dto';
 import { StoreDto } from './dto/store.dto';
@@ -27,5 +27,10 @@ export class StoresController {
   ): Promise<StoreDto> {
     const store = await this.storesService.create(createStoreRequestDto);
     return new StoreDto(store);
+  }
+
+  @Delete(':id')
+  deleteById(@Param('id') id: number): Promise<void> {
+    return this.storesService.deleteById(id);
   }
 }
