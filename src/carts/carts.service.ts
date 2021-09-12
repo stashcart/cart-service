@@ -13,12 +13,12 @@ import { AddCartItemRequestDto } from './dto/add-cart-item.request.dto';
 import { CreateCartRequestDto } from './dto/create-cart.request.dto';
 import { CartItem, CartItemStatus } from './entities/cart-item.entity';
 import { Cart } from './entities/cart.entity';
+import { CartsRepository } from './repositories/carts.repository';
 
 @Injectable()
 export class CartsService {
   constructor(
-    @InjectRepository(Cart)
-    private readonly cartsRepository: Repository<Cart>,
+    private readonly cartsRepository: CartsRepository,
     @InjectRepository(CartItem)
     private readonly cartItemsRepository: Repository<CartItem>,
     private readonly usersService: UsersService,
@@ -26,12 +26,8 @@ export class CartsService {
     private readonly productsService: ProductsService
   ) {}
 
-  // TODO: Add items status
-  findOpenedCartsWithItems(): Promise<Cart[]> {
-    return this.cartsRepository.find({
-      where: { isClosed: false },
-      relations: ['items'],
-    });
+  findOpenedCartsWithItems(itemsStatus?: CartItemStatus): Promise<Cart[]> {
+    return this.cartsRepository.findAllWithItemsByItemsStatus(itemsStatus);
   }
 
   async findCartByIdWithItems(id: number): Promise<Cart> {
@@ -61,6 +57,7 @@ export class CartsService {
     cart.isAutoApproveEnabled = createCartDto.isAutoApproveEnabled ?? false;
     cart.owner = await this.usersService.findById(createCartDto.ownerId);
     cart.store = await this.storesService.findById(createCartDto.storeId);
+    cart.items = [];
 
     return this.cartsRepository.save(cart);
   }

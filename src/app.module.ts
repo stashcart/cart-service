@@ -21,6 +21,7 @@ import { CartsModule } from './carts/carts.module';
         database: configService.get('DB_NAME'),
         password: configService.get('DB_PASSWORD'),
         autoLoadEntities: true,
+        logging: true,
         synchronize: true,
       }),
     }),

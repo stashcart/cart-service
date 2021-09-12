@@ -5,12 +5,12 @@ import { StoresModule } from 'src/stores/stores.module';
 import { ProductsModule } from 'src/products/products.module';
 import { CartsService } from './carts.service';
 import { CartsController } from './carts.controller';
-import { Cart } from './entities/cart.entity';
 import { CartItem } from './entities/cart-item.entity';
+import { CartsRepository } from './repositories/carts.repository';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Cart, CartItem]),
+    TypeOrmModule.forFeature([CartsRepository, CartItem]),
     UsersModule,
     StoresModule,
     ProductsModule,

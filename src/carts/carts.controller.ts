@@ -6,13 +6,15 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiParam, ApiTags } from '@nestjs/swagger';
 import { CartsService } from './carts.service';
 import { AddCartItemRequestDto } from './dto/add-cart-item.request.dto';
 import { CartItemDto } from './dto/cart-item.dto';
 import { CartDto } from './dto/cart.dto';
 import { CreateCartRequestDto } from './dto/create-cart.request.dto';
+import { FindAllCartsQueryDto } from './dto/find-all-carts.query.dto';
 import { PatchCartRequestDto } from './dto/patch-cart.request.dto';
 
 @Controller('carts')
@@ -20,10 +22,11 @@ import { PatchCartRequestDto } from './dto/patch-cart.request.dto';
 export class CartsController {
   constructor(private readonly cartsService: CartsService) {}
 
-  // TODO: Add items status query
   @Get()
-  async findAllCarts(): Promise<CartDto[]> {
-    const carts = await this.cartsService.findOpenedCartsWithItems();
+  async findAllCarts(@Query() query: FindAllCartsQueryDto): Promise<CartDto[]> {
+    const carts = await this.cartsService.findOpenedCartsWithItems(
+      query.itemsStatus
+    );
     return carts.map((cart) => new CartDto(cart));
   }
 
@@ -41,6 +44,7 @@ export class CartsController {
     return new CartDto(cart);
   }
 
+  @ApiParam({ name: 'id' })
   @Patch(':id')
   async patchCart(
     @Param('id') id,
