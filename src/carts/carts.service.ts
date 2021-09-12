@@ -11,6 +11,7 @@ import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
 import { AddCartItemRequestDto } from './dto/add-cart-item.request.dto';
 import { CreateCartRequestDto } from './dto/create-cart.request.dto';
+import { PatchCartRequestDto } from './dto/patch-cart.request.dto';
 import { CartItem, CartItemStatus } from './entities/cart-item.entity';
 import { Cart } from './entities/cart.entity';
 import { CartsRepository } from './repositories/carts.repository';
@@ -63,15 +64,10 @@ export class CartsService {
   }
 
   // TODO: Add optional ownerId
-  async patchCart({
+  async patchCart(
     id,
-    title,
-    isAutoApproveEnabled,
-  }: {
-    id: number;
-    title?: string;
-    isAutoApproveEnabled?: boolean;
-  }): Promise<Cart> {
+    { title, isAutoApproveEnabled }: PatchCartRequestDto
+  ): Promise<Cart> {
     const cart = await this.findCartByIdWithItems(id);
 
     if (isDefined(title)) {

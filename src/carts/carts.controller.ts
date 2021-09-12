@@ -50,10 +50,7 @@ export class CartsController {
     @Param('id') id,
     @Body() patchCartRequestDto: PatchCartRequestDto
   ): Promise<CartDto> {
-    const cart = await this.cartsService.patchCart({
-      ...patchCartRequestDto,
-      id,
-    });
+    const cart = await this.cartsService.patchCart(id, patchCartRequestDto);
     return new CartDto(cart);
   }
 
