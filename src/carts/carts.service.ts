@@ -28,6 +28,7 @@ export class CartsService {
   ) {}
 
   findOpenedCartsWithItems(itemsStatus?: CartItemStatus): Promise<Cart[]> {
+    // TODO: Remove repository
     return this.cartsRepository.findAllWithItemsByItemsStatus(itemsStatus);
   }
 
@@ -129,6 +130,7 @@ export class CartsService {
     cartId: number,
     status?: CartItemStatus
   ): Promise<CartItem[]> {
+    // FIXME: Whitelist
     return this.cartItemsRepository.find({
       cart: { id: cartId },
       status,

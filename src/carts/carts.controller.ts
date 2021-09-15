@@ -79,5 +79,17 @@ export class CartsController {
     return this.cartsService.deleteItemFromCart(cartId, itemId);
   }
 
-  // TODO: findAllPendingItems, approve, reject
+  @Get(':cartId/items')
+  async findAll(
+    @Param('cartId') cartId: number,
+    @Query() query: FindAllCartsQueryDto
+  ): Promise<CartItemDto[]> {
+    const items = await this.cartsService.findAllCartItemsByCartIdAndStatus(
+      cartId,
+      query.itemsStatus
+    );
+    return items.map((item) => new CartItemDto(item));
+  }
+
+  // TODO: approve, reject
 }

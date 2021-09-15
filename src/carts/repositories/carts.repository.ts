@@ -12,6 +12,7 @@ export class CartsRepository extends Repository<Cart> {
       where['items.status'] = itemsStatus;
     }
 
+    // TODO: Whitelist
     return this.find({
       where,
       relations: ['items'],
