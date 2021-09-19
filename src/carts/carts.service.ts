@@ -8,18 +8,19 @@ import { isDefined } from 'class-validator';
 import { ProductsService } from 'src/products/products.service';
 import { StoresService } from 'src/stores/stores.service';
 import { UsersService } from 'src/users/users.service';
+import { whitelist } from 'src/_common/utils/whitelist';
 import { Repository } from 'typeorm';
 import { AddCartItemRequestDto } from './dto/add-cart-item.request.dto';
 import { CreateCartRequestDto } from './dto/create-cart.request.dto';
 import { PatchCartRequestDto } from './dto/patch-cart.request.dto';
 import { CartItem, CartItemStatus } from './entities/cart-item.entity';
 import { Cart } from './entities/cart.entity';
-import { CartsRepository } from './repositories/carts.repository';
 
 @Injectable()
 export class CartsService {
   constructor(
-    private readonly cartsRepository: CartsRepository,
+    @InjectRepository(Cart)
+    private readonly cartsRepository: Repository<Cart>,
     @InjectRepository(CartItem)
     private readonly cartItemsRepository: Repository<CartItem>,
     private readonly usersService: UsersService,
@@ -28,8 +29,13 @@ export class CartsService {
   ) {}
 
   findOpenedCartsWithItems(itemsStatus?: CartItemStatus): Promise<Cart[]> {
-    // TODO: Remove repository
-    return this.cartsRepository.findAllWithItemsByItemsStatus(itemsStatus);
+    return this.cartsRepository.find({
+      where: whitelist({
+        isClosed: false,
+        'items.status': itemsStatus,
+      }),
+      relations: ['items'],
+    });
   }
 
   async findCartByIdWithItems(id: number): Promise<Cart> {

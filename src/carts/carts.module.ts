@@ -6,11 +6,11 @@ import { ProductsModule } from 'src/products/products.module';
 import { CartsService } from './carts.service';
 import { CartsController } from './carts.controller';
 import { CartItem } from './entities/cart-item.entity';
-import { CartsRepository } from './repositories/carts.repository';
+import { Cart } from './entities/cart.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([CartsRepository, CartItem]),
+    TypeOrmModule.forFeature([Cart, CartItem]),
     UsersModule,
     StoresModule,
     ProductsModule,
