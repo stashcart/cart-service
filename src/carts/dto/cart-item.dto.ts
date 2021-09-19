@@ -3,6 +3,8 @@ import { UserDto } from 'src/users/dto/user.dto';
 import { CartItem, CartItemStatus } from '../entities/cart-item.entity';
 
 export class CartItemDto {
+  id: number;
+
   customer: UserDto;
 
   product: ProductDto;
@@ -12,6 +14,7 @@ export class CartItemDto {
   status: CartItemStatus;
 
   constructor(item: CartItem) {
+    this.id = item.id;
     this.customer = new UserDto(item.customer);
     this.product = new ProductDto(item.product);
     this.amount = item.amount;

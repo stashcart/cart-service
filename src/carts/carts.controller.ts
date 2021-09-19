@@ -8,7 +8,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { OnBehalfOf } from 'src/_common/decorators/on-behalf-of.decorator';
 import { ApiOnBehalfOf } from 'src/_common/decorators/swagger/api.on-behalf-of.decorator';
 import { CartsService } from './carts.service';
@@ -34,7 +34,7 @@ export class CartsController {
   }
 
   @Get(':id')
-  async findCartById(@Param('id') id): Promise<CartDto> {
+  async findCartById(@Param('id') id: number): Promise<CartDto> {
     const cart = await this.cartsService.findCartByIdWithItems(id);
     return new CartDto(cart);
   }
@@ -52,11 +52,10 @@ export class CartsController {
     return new CartDto(cart);
   }
 
-  @ApiParam({ name: 'id' })
   @ApiOnBehalfOf()
   @Patch(':id')
   async patchCart(
-    @Param('id') id,
+    @Param('id') id: number,
     @Body() patchCartRequestDto: PatchCartRequestDto,
     @OnBehalfOf() userId?: string
   ): Promise<CartDto> {
@@ -130,7 +129,7 @@ export class CartsController {
   }
 
   @ApiOnBehalfOf()
-  @Post(':cartId/items/:itemId/approve')
+  @Post(':cartId/items/:itemId/reject')
   async rejectCartItem(
     @Param('cartId') cartId: number,
     @Param('itemId') itemId: number,
