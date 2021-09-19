@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -28,6 +29,7 @@ export class CartsService {
     private readonly productsService: ProductsService
   ) {}
 
+  // TODO: Rewrite to query builder
   findOpenedCartsWithItems(itemsStatus?: CartItemStatus): Promise<Cart[]> {
     return this.cartsRepository.find({
       where: whitelist({
@@ -70,12 +72,16 @@ export class CartsService {
     return this.cartsRepository.save(cart);
   }
 
-  // TODO: Add optional ownerId
   async patchCart(
     id,
+    ownerId: string | undefined,
     { title, isAutoApproveEnabled }: PatchCartRequestDto
   ): Promise<Cart> {
     const cart = await this.findCartByIdWithItems(id);
+
+    if (!this.isCartOwnerOrUndefined(cart, ownerId)) {
+      throw new ForbiddenException('Only cart owner can update cart');
+    }
 
     if (isDefined(title)) {
       cart.title = title;
@@ -87,9 +93,12 @@ export class CartsService {
     return this.cartsRepository.save(cart);
   }
 
-  // TODO: Add optional ownerId
-  async closeCart(id: number): Promise<void> {
+  async closeCart(id: number, ownerId?: string): Promise<void> {
     const cart = await this.findCartById(id);
+
+    if (!this.isCartOwnerOrUndefined(cart, ownerId)) {
+      throw new ForbiddenException('Only cart owner can close cart');
+    }
 
     cart.isClosed = true;
 
@@ -132,15 +141,20 @@ export class CartsService {
     return cart.owner.id === userId;
   }
 
+  private isCartOwnerOrUndefined(cart: Cart, userId?: string): boolean {
+    return userId === undefined || this.isCartOwner(cart, userId);
+  }
+
   async findAllCartItemsByCartIdAndStatus(
     cartId: number,
     status?: CartItemStatus
   ): Promise<CartItem[]> {
-    // FIXME: Whitelist
-    return this.cartItemsRepository.find({
-      cart: { id: cartId },
-      status,
-    });
+    return this.cartItemsRepository.find(
+      whitelist({
+        cart: { id: cartId },
+        status,
+      })
+    );
   }
 
   async findCartItemByIdAndCartId(
@@ -161,15 +175,24 @@ export class CartsService {
     return item;
   }
 
-  // TODO: Add optional deleterId
-  async deleteItemFromCart(cartId: number, cartItemId: number): Promise<void> {
+  async deleteItemFromCart(
+    cartId: number,
+    cartItemId: number,
+    deleterId?: string
+  ): Promise<void> {
     const item = await this.findCartItemByIdAndCartId(cartItemId, cartId);
 
+    if (item.status !== CartItemStatus.PENDING) {
+      throw new BadRequestException("Can't delete approved/rejected item");
+    }
+
     if (
-      this.isCartOwner(item.cart, item.customer.id) ||
-      item.status !== CartItemStatus.PENDING
+      item.customer.id !== deleterId &&
+      !this.isCartOwnerOrUndefined(item.cart, deleterId)
     ) {
-      throw new BadRequestException("Can't delete item");
+      throw new ForbiddenException(
+        "Can't delete item. User must be an owner of cart ot cart item"
+      );
     }
 
     await this.cartItemsRepository.delete({
@@ -178,17 +201,25 @@ export class CartsService {
     });
   }
 
-  // TODO: Add optional ownerId
-  async approveCartItem(cartId: number, cartItemId: number): Promise<CartItem> {
+  async setCartItemStatus({
+    cartId,
+    cartItemId,
+    ownerId,
+    status,
+  }: {
+    cartId: number;
+    cartItemId: number;
+    ownerId?: string;
+    status: CartItemStatus;
+  }): Promise<CartItem> {
     const item = await this.findCartItemByIdAndCartId(cartItemId, cartId);
-    item.status = CartItemStatus.APPROVED;
-    return this.cartItemsRepository.save(item);
-  }
 
-  // TODO: Add optional ownerId
-  async rejectCartItem(cartId: number, cartItemId: number): Promise<CartItem> {
-    const item = await this.findCartItemByIdAndCartId(cartItemId, cartId);
-    item.status = CartItemStatus.REJECTED;
+    if (!this.isCartOwnerOrUndefined(item.cart, ownerId)) {
+      throw new ForbiddenException('Only cart owner can approve/reject item');
+    }
+
+    item.status = status;
+
     return this.cartItemsRepository.save(item);
   }
 }

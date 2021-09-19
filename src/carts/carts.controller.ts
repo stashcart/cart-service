@@ -9,6 +9,8 @@ import {
   Query,
 } from '@nestjs/common';
 import { ApiParam, ApiTags } from '@nestjs/swagger';
+import { OnBehalfOf } from 'src/_common/decorators/on-behalf-of.decorator';
+import { ApiOnBehalfOf } from 'src/_common/decorators/swagger/api.on-behalf-of.decorator';
 import { CartsService } from './carts.service';
 import { AddCartItemRequestDto } from './dto/add-cart-item.request.dto';
 import { CartItemDto } from './dto/cart-item.dto';
@@ -16,6 +18,7 @@ import { CartDto } from './dto/cart.dto';
 import { CreateCartRequestDto } from './dto/create-cart.request.dto';
 import { FindAllCartsQueryDto } from './dto/find-all-carts.query.dto';
 import { PatchCartRequestDto } from './dto/patch-cart.request.dto';
+import { CartItemStatus } from './entities/cart-item.entity';
 
 @Controller('carts')
 @ApiTags('Carts')
@@ -36,51 +39,70 @@ export class CartsController {
     return new CartDto(cart);
   }
 
+  @ApiOnBehalfOf()
   @Post()
   async create(
-    @Body() createCartRequestDto: CreateCartRequestDto
+    @Body() { ownerId, ...createCartRequestDto }: CreateCartRequestDto,
+    @OnBehalfOf() userId?: string
   ): Promise<CartDto> {
-    const cart = await this.cartsService.createCart(createCartRequestDto);
+    const cart = await this.cartsService.createCart({
+      ...createCartRequestDto,
+      ownerId: userId ?? ownerId,
+    });
     return new CartDto(cart);
   }
 
   @ApiParam({ name: 'id' })
+  @ApiOnBehalfOf()
   @Patch(':id')
   async patchCart(
     @Param('id') id,
-    @Body() patchCartRequestDto: PatchCartRequestDto
+    @Body() patchCartRequestDto: PatchCartRequestDto,
+    @OnBehalfOf() userId?: string
   ): Promise<CartDto> {
-    const cart = await this.cartsService.patchCart(id, patchCartRequestDto);
+    const cart = await this.cartsService.patchCart(
+      id,
+      userId,
+      patchCartRequestDto
+    );
     return new CartDto(cart);
   }
 
+  @ApiOnBehalfOf()
   @Post(':id/close')
-  closeCart(@Param('id') id: number): Promise<void> {
-    return this.cartsService.closeCart(id);
+  closeCart(
+    @Param('id') id: number,
+    @OnBehalfOf() userId?: string
+  ): Promise<void> {
+    return this.cartsService.closeCart(id, userId);
   }
 
+  @ApiOnBehalfOf()
   @Post(':cartId/items')
   async addItem(
     @Param('cartId') cartId: number,
-    @Body() addCartItemRequestDto: AddCartItemRequestDto
+    @Body() { customerId, ...addCartItemRequestDto }: AddCartItemRequestDto,
+    @OnBehalfOf() userId?: string
   ): Promise<CartItemDto> {
-    const item = await this.cartsService.addItemToCart(
-      cartId,
-      addCartItemRequestDto
-    );
+    const item = await this.cartsService.addItemToCart(cartId, {
+      ...addCartItemRequestDto,
+      customerId: userId ?? customerId,
+    });
     return new CartItemDto(item);
   }
 
+  @ApiOnBehalfOf()
   @Delete(':cartId/items/:itemId')
   deleteItemFromCart(
     @Param('cartId') cartId: number,
-    @Param('itemId') itemId: number
+    @Param('itemId') itemId: number,
+    @OnBehalfOf() userId?: string
   ): Promise<void> {
-    return this.cartsService.deleteItemFromCart(cartId, itemId);
+    return this.cartsService.deleteItemFromCart(cartId, itemId, userId);
   }
 
   @Get(':cartId/items')
-  async findAll(
+  async findAllCartItems(
     @Param('cartId') cartId: number,
     @Query() query: FindAllCartsQueryDto
   ): Promise<CartItemDto[]> {
@@ -91,5 +113,35 @@ export class CartsController {
     return items.map((item) => new CartItemDto(item));
   }
 
-  // TODO: approve, reject
+  @ApiOnBehalfOf()
+  @Post(':cartId/items/:itemId/approve')
+  async approveCartItem(
+    @Param('cartId') cartId: number,
+    @Param('itemId') itemId: number,
+    @OnBehalfOf() userId?: string
+  ): Promise<CartItemDto> {
+    const item = await this.cartsService.setCartItemStatus({
+      cartId,
+      cartItemId: itemId,
+      ownerId: userId,
+      status: CartItemStatus.APPROVED,
+    });
+    return new CartItemDto(item);
+  }
+
+  @ApiOnBehalfOf()
+  @Post(':cartId/items/:itemId/approve')
+  async rejectCartItem(
+    @Param('cartId') cartId: number,
+    @Param('itemId') itemId: number,
+    @OnBehalfOf() userId?: string
+  ): Promise<CartItemDto> {
+    const item = await this.cartsService.setCartItemStatus({
+      cartId,
+      cartItemId: itemId,
+      ownerId: userId,
+      status: CartItemStatus.REJECTED,
+    });
+    return new CartItemDto(item);
+  }
 }
