@@ -5,7 +5,7 @@ import { createParamDecorator, ExecutionContext } from '@nestjs/common';
  *
  * @example
  * .@Get()
- * async find(@OnBehalfOf() userId: string) {}
+ * async find(@OnBehalfOf() userId?: string) {}
  */
 export const OnBehalfOf = createParamDecorator(
   (data: unknown, ctx: ExecutionContext) => {
