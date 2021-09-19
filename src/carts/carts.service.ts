@@ -16,12 +16,12 @@ import { CreateCartRequestDto } from './dto/create-cart.request.dto';
 import { PatchCartRequestDto } from './dto/patch-cart.request.dto';
 import { CartItem, CartItemStatus } from './entities/cart-item.entity';
 import { Cart } from './entities/cart.entity';
+import { CartsRepository } from './repositories/carts.repository';
 
 @Injectable()
 export class CartsService {
   constructor(
-    @InjectRepository(Cart)
-    private readonly cartsRepository: Repository<Cart>,
+    private readonly cartsRepository: CartsRepository,
     @InjectRepository(CartItem)
     private readonly cartItemsRepository: Repository<CartItem>,
     private readonly usersService: UsersService,
@@ -29,15 +29,8 @@ export class CartsService {
     private readonly productsService: ProductsService
   ) {}
 
-  // TODO: Rewrite to query builder
   findOpenedCartsWithItems(itemsStatus?: CartItemStatus): Promise<Cart[]> {
-    return this.cartsRepository.find({
-      where: whitelist({
-        isClosed: false,
-        'items.status': itemsStatus,
-      }),
-      relations: ['items'],
-    });
+    return this.cartsRepository.findAllWithItemsByItemsStatus(itemsStatus);
   }
 
   async findCartByIdWithItems(id: number): Promise<Cart> {
