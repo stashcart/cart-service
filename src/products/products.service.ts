@@ -4,7 +4,7 @@ import { isDefined } from 'class-validator';
 import { AmqpService } from 'src/amqp/amqp.service';
 import { StoresService } from 'src/stores/stores.service';
 import { Repository } from 'typeorm';
-import { ParsePriceRequestDto } from './dto/parse-price.request.dto';
+import { ParseProductRequestDto } from './dto/parse-product.request.dto';
 import { PatchProductRequestDto } from './dto/patch-product.request.dto';
 import { Product } from './entities/product.entity';
 
@@ -57,7 +57,7 @@ export class ProductsService {
     await this.amqpService.publish(
       'product',
       'parse',
-      new ParsePriceRequestDto(product)
+      new ParseProductRequestDto(product)
     );
 
     return product;

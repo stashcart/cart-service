@@ -1,6 +1,6 @@
 import { Product } from '../entities/product.entity';
 
-export class ParsePriceRequestDto {
+export class ParseProductRequestDto {
   id: number;
 
   url: string;

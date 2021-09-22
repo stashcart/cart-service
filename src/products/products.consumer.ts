@@ -1,6 +1,6 @@
 import { RabbitSubscribe } from '@golevelup/nestjs-rabbitmq';
 import { Injectable } from '@nestjs/common';
-import { ParseProductResponseDto } from './dto/parsed-product.response.dto';
+import { ParseProductResponseDto } from './dto/parse-product.response.dto';
 import { ProductsService } from './products.service';
 
 @Injectable()
