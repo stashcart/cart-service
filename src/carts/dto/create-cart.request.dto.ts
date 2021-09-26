@@ -10,15 +10,15 @@ import {
 
 export class CreateCartRequestDto {
   @IsUUID()
-  ownerId: string;
+  ownerId!: string;
 
   @ApiProperty({ example: 'My cart' })
   @IsNotEmpty()
   @IsString()
-  title: string;
+  title!: string;
 
   @IsNumber()
-  storeId: number;
+  storeId!: number;
 
   @ApiProperty({ example: false })
   @IsOptional()

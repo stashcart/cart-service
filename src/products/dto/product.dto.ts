@@ -7,7 +7,7 @@ export class ProductDto {
 
   price: number | null;
 
-  name: string;
+  name: string | null;
 
   storeName: string;
 

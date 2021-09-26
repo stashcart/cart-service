@@ -61,8 +61,8 @@ export class CartsController {
   ): Promise<CartDto> {
     const cart = await this.cartsService.patchCart(
       id,
-      userId,
-      patchCartRequestDto
+      patchCartRequestDto,
+      userId
     );
     return new CartDto(cart);
   }

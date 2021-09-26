@@ -5,9 +5,9 @@ export class CreateStoreRequestDto {
   @ApiProperty({ example: 'iherb' })
   @IsString()
   @IsNotEmpty()
-  name: string;
+  name!: string;
 
   @ApiProperty({ example: 'https://ua.iherb.com' })
   @IsUrl()
-  url: string;
+  url!: string;
 }

@@ -19,27 +19,27 @@ export enum CartItemStatus {
 @Entity('cart_items')
 export class CartItem {
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @ManyToOne(() => Cart, { eager: true })
   @JoinColumn({ name: 'cart_id' })
-  cart: Cart;
+  cart!: Cart;
 
   @ManyToOne(() => User, { eager: true })
   @JoinColumn({ name: 'customer_id' })
-  customer: User;
+  customer!: User;
 
   @Column()
-  amount: number;
+  amount!: number;
 
   @Column({
     type: 'enum',
     enum: CartItemStatus,
     default: CartItemStatus.PENDING,
   })
-  status: CartItemStatus;
+  status!: CartItemStatus;
 
   @ManyToOne(() => Product, { eager: true })
   @JoinColumn({ name: 'product_id' })
-  product: Product;
+  product!: Product;
 }

@@ -14,25 +14,25 @@ import { CartItem } from './cart-item.entity';
 @Entity('carts')
 export class Cart {
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @Column()
-  title: string;
+  title!: string;
 
   @ManyToOne(() => User, { eager: true })
   @JoinColumn({ name: 'owner_id' })
-  owner: User;
+  owner!: User;
 
   @ManyToOne(() => Store, { eager: true })
   @JoinColumn({ name: 'store_id' })
-  store: Store;
+  store!: Store;
 
   @OneToMany(() => CartItem, (cp) => cp.product)
-  items: CartItem[];
+  items!: CartItem[];
 
   @Column({ name: 'is_auto_approve_enabled', default: false })
-  isAutoApproveEnabled: boolean;
+  isAutoApproveEnabled!: boolean;
 
   @Column({ name: 'is_closed', default: false })
-  isClosed: boolean;
+  isClosed!: boolean;
 }

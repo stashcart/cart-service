@@ -10,18 +10,18 @@ import {
 @Entity('products')
 export class Product {
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @Column({ unique: true })
-  url: string;
+  url!: string;
 
   @Column({ nullable: true })
-  price: number | null;
+  price!: number | null;
 
   @Column({ nullable: true })
-  name: string | null;
+  name!: string | null;
 
   @ManyToOne(() => Store, { eager: true })
   @JoinColumn({ name: 'store_id' })
-  store: Store;
+  store!: Store;
 }

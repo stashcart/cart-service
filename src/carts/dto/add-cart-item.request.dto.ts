@@ -3,7 +3,7 @@ import { IsDefined, IsNumber, IsUrl, IsUUID, Min } from 'class-validator';
 
 export class AddCartItemRequestDto {
   @IsUUID()
-  customerId: string;
+  customerId!: string;
 
   @ApiProperty({
     example:
@@ -11,10 +11,10 @@ export class AddCartItemRequestDto {
   })
   @IsUrl()
   @IsDefined()
-  productUrl: string;
+  productUrl!: string;
 
   @ApiProperty({ example: 1 })
   @IsNumber()
   @Min(1)
-  amount: number;
+  amount!: number;
 }

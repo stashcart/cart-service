@@ -1,6 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { isDefined } from 'class-validator';
 import { AmqpService } from 'src/amqp/amqp.service';
 import { StoresService } from 'src/stores/stores.service';
 import { Repository } from 'typeorm';
@@ -69,10 +68,10 @@ export class ProductsService {
   ): Promise<Product> {
     const product = await this.findById(cartId);
 
-    if (isDefined(product.price)) {
+    if (price !== undefined) {
       product.price = price;
     }
-    if (isDefined(product.name)) {
+    if (name !== undefined) {
       product.name = name;
     }
 

@@ -5,7 +5,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { isDefined } from 'class-validator';
 import { ProductsService } from 'src/products/products.service';
 import { StoresService } from 'src/stores/stores.service';
 import { UsersService } from 'src/users/users.service';
@@ -34,9 +33,11 @@ export class CartsService {
   }
 
   async findCartByIdWithItems(id: number): Promise<Cart> {
-    const cart = this.cartsRepository.findOne(id, { relations: ['items'] });
+    const cart = await this.cartsRepository.findOne(id, {
+      relations: ['items'],
+    });
 
-    if (!cart) {
+    if (cart === undefined) {
       throw new NotFoundException(`Cart: ${id}`);
     }
 
@@ -44,7 +45,7 @@ export class CartsService {
   }
 
   async findCartById(id: number): Promise<Cart> {
-    const cart = this.cartsRepository.findOne(id);
+    const cart = await this.cartsRepository.findOne(id);
 
     if (!cart) {
       throw new NotFoundException(`Cart: ${id}`);
@@ -66,9 +67,9 @@ export class CartsService {
   }
 
   async patchCart(
-    id,
-    ownerId: string | undefined,
-    { title, isAutoApproveEnabled }: PatchCartRequestDto
+    id: number,
+    { title, isAutoApproveEnabled }: PatchCartRequestDto,
+    ownerId?: string
   ): Promise<Cart> {
     const cart = await this.findCartByIdWithItems(id);
 
@@ -76,10 +77,10 @@ export class CartsService {
       throw new ForbiddenException('Only cart owner can update cart');
     }
 
-    if (isDefined(title)) {
+    if (title !== undefined) {
       cart.title = title;
     }
-    if (isDefined(isAutoApproveEnabled)) {
+    if (isAutoApproveEnabled !== undefined) {
       cart.isAutoApproveEnabled = isAutoApproveEnabled;
     }
 

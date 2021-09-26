@@ -1,7 +1,7 @@
 export class ParseProductResponseDto {
-  id: number;
+  id!: number;
 
-  name: string;
+  name!: string;
 
-  price: number;
+  price!: number;
 }
