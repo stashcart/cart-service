@@ -16,10 +16,10 @@ export class Product {
   url!: string;
 
   @Column({ nullable: true })
-  price!: number | null;
+  price?: number;
 
   @Column({ nullable: true })
-  name!: string | null;
+  name?: string;
 
   @ManyToOne(() => Store, { eager: true })
   @JoinColumn({ name: 'store_id' })

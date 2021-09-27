@@ -14,8 +14,8 @@ export class ProductDto {
   constructor(product: Product) {
     this.id = product.id;
     this.url = product.url;
-    this.price = product.price;
-    this.name = product.name;
+    this.price = product.price ?? null;
+    this.name = product.name ?? null;
     this.storeName = product.store.name;
   }
 }
