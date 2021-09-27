@@ -13,6 +13,6 @@ export class ProductsConsumer {
     queue: 'cart-service-queue',
   })
   patchProductWithParseData(parsedProductDto: ParseProductResponseDto) {
-    this.productsService.patch(parsedProductDto.id, parsedProductDto);
+    this.productsService.patchByUrl(parsedProductDto.url, parsedProductDto);
   }
 }

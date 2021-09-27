@@ -1,5 +1,7 @@
 export class ParseProductResponseDto {
-  id!: number;
+  url!: string;
+
+  storeName!: string;
 
   name!: string;
 

@@ -26,7 +26,7 @@ export class ProductsController {
     @Param('id') id: number,
     @Body() patchProductRequestDto: PatchProductRequestDto
   ): Promise<ProductDto> {
-    const product = await this.productsService.patch(
+    const product = await this.productsService.patchById(
       id,
       patchProductRequestDto
     );

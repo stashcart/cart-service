@@ -62,19 +62,42 @@ export class ProductsService {
     return product;
   }
 
-  async patch(
-    cartId: number,
+  private patch(
+    product: Product,
     { price, name }: PatchProductRequestDto
+  ): Promise<Product> {
+    const patchedProduct = new Product();
+    patchedProduct.id = product.id;
+
+    if (price !== undefined) {
+      patchedProduct.price = price;
+    }
+    if (name !== undefined) {
+      patchedProduct.name = name;
+    }
+
+    return this.productsRepository.save(patchedProduct);
+  }
+
+  async patchById(
+    cartId: number,
+    patchProductDto: PatchProductRequestDto
   ): Promise<Product> {
     const product = await this.findById(cartId);
 
-    if (price !== undefined) {
-      product.price = price;
-    }
-    if (name !== undefined) {
-      product.name = name;
+    return this.patch(product, patchProductDto);
+  }
+
+  async patchByUrl(
+    url: string,
+    patchProductDto: PatchProductRequestDto
+  ): Promise<Product> {
+    const product = await this.productsRepository.findOne({ url });
+
+    if (!product) {
+      throw new NotFoundException(`Product: url=${url}`);
     }
 
-    return this.productsRepository.save(product);
+    return this.patch(product, patchProductDto);
   }
 }
