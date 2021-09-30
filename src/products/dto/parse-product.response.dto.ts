@@ -3,7 +3,7 @@ export class ParseProductResponseDto {
 
   storeName!: string;
 
-  name!: string;
+  name!: string | null;
 
-  price!: number;
+  price!: number | null;
 }

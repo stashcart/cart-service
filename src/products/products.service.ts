@@ -55,7 +55,7 @@ export class ProductsService {
 
     await this.amqpService.publish(
       'product',
-      'parse',
+      'product.parse',
       new ParseProductRequestDto(product)
     );
 

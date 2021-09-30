@@ -12,7 +12,10 @@ export class ProductsConsumer {
     routingKey: 'product.parsed',
     queue: 'cart-service-queue',
   })
-  patchProductWithParseData(parsedProductDto: ParseProductResponseDto) {
-    this.productsService.patchByUrl(parsedProductDto.url, parsedProductDto);
+  patchProductWithParseData({ name, price, url }: ParseProductResponseDto) {
+    this.productsService.patchByUrl(url, {
+      name: name ?? undefined,
+      price: price ?? undefined,
+    });
   }
 }
