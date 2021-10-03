@@ -16,7 +16,11 @@ import { AmqpService } from './amqp.service';
             type: 'topic',
           },
           {
-            name: 'profile.write',
+            name: 'profile',
+            type: 'topic',
+          },
+          {
+            name: 'user',
             type: 'topic',
           },
         ],

@@ -8,9 +8,9 @@ export class UsersConsumer {
   constructor(private readonly usersService: UsersService) {}
 
   @RabbitSubscribe({
-    exchange: 'user.write',
+    exchange: 'user',
     routingKey: 'user.*',
-    queue: 'user.write.cart-service',
+    queue: 'user.*.cart-service',
   })
   createProfile(profileDto: ProfileDto) {
     this.usersService.putUserFromProfile(profileDto);
