@@ -10,7 +10,6 @@ export class UsersConsumer {
   @RabbitSubscribe({
     exchange: 'user.write',
     routingKey: 'user.*',
-    queue: 'cart-service-queue',
   })
   createProfile(profileDto: ProfileDto) {
     this.usersService.putUserFromProfile(profileDto);

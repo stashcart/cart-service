@@ -10,7 +10,6 @@ export class ProductsConsumer {
   @RabbitSubscribe({
     exchange: 'product',
     routingKey: 'product.parsed',
-    queue: 'cart-service-queue',
   })
   patchProductWithParseData({ name, price, url }: ParseProductResponseDto) {
     this.productsService.patchByUrl(url, {
