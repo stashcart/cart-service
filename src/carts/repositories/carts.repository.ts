@@ -1,19 +1,25 @@
-import { EntityRepository, Repository, SelectQueryBuilder } from 'typeorm';
+import { EntityRepository, ObjectLiteral, Repository } from 'typeorm';
 import { CartItemStatus } from '../entities/cart-item.entity';
 import { Cart } from '../entities/cart.entity';
 
 @EntityRepository(Cart)
 export class CartsRepository extends Repository<Cart> {
-  findAllWithItemsByItemsStatus(itemsStatus?: CartItemStatus): Promise<Cart[]> {
-    return this.find({
-      where: (qb: SelectQueryBuilder<Cart>) => {
-        qb.where({ isClosed: false });
+  async findByIdWithItemsWithItemsStatus(
+    itemsStatus?: CartItemStatus
+  ): Promise<Cart | undefined> {
+    const itemsJoinCondition: [string | undefined, ObjectLiteral | undefined] =
+      itemsStatus
+        ? ['items.status = :itemsStatus', { itemsStatus }]
+        : [undefined, undefined];
 
-        if (itemsStatus !== undefined) {
-          qb.andWhere('Cart__items.status = :itemsStatus', { itemsStatus });
-        }
-      },
-      relations: ['items'],
-    });
+    return this.createQueryBuilder('cart')
+      .leftJoinAndSelect('cart.items', 'items', ...itemsJoinCondition)
+      .leftJoinAndSelect('items.customer', 'itemCustomer')
+      .leftJoinAndSelect('items.product', 'itemsProduct')
+      .leftJoinAndSelect('itemsProduct.store', 'itemsProductStore')
+      .leftJoinAndSelect('cart.owner', 'owner')
+      .leftJoinAndSelect('cart.store', 'store')
+      .where('cart.isClosed = false')
+      .getOne();
   }
 }

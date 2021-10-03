@@ -14,9 +14,10 @@ import { ApiOnBehalfOf } from 'src/_common/decorators/swagger/api.on-behalf-of.d
 import { CartsService } from './carts.service';
 import { AddCartItemRequestDto } from './dto/add-cart-item.request.dto';
 import { CartItemDto } from './dto/cart-item.dto';
+import { CartPreviewDto } from './dto/cart-preview.dto';
 import { CartDto } from './dto/cart.dto';
 import { CreateCartRequestDto } from './dto/create-cart.request.dto';
-import { FindAllCartsQueryDto } from './dto/find-all-carts.query.dto';
+import { ItemsQueryDto } from './dto/items.query.dto';
 import { PatchCartRequestDto } from './dto/patch-cart.request.dto';
 import { CartItemStatus } from './entities/cart-item.entity';
 
@@ -26,16 +27,20 @@ export class CartsController {
   constructor(private readonly cartsService: CartsService) {}
 
   @Get()
-  async findAllCarts(@Query() query: FindAllCartsQueryDto): Promise<CartDto[]> {
-    const carts = await this.cartsService.findOpenedCartsWithItems(
-      query.itemsStatus
-    );
-    return carts.map((cart) => new CartDto(cart));
+  async findAllCarts(): Promise<CartPreviewDto[]> {
+    const carts = await this.cartsService.findOpenedCartsWithItems();
+    return carts.map((cart) => new CartPreviewDto(cart));
   }
 
   @Get(':id')
-  async findCartById(@Param('id') id: number): Promise<CartDto> {
-    const cart = await this.cartsService.findCartByIdWithItems(id);
+  async findCartById(
+    @Param('id') id: number,
+    @Query() query: ItemsQueryDto
+  ): Promise<CartDto> {
+    const cart = await this.cartsService.findCartByIdWithItems(
+      id,
+      query.itemsStatus
+    );
     return new CartDto(cart);
   }
 
@@ -103,7 +108,7 @@ export class CartsController {
   @Get(':cartId/items')
   async findAllCartItems(
     @Param('cartId') cartId: number,
-    @Query() query: FindAllCartsQueryDto
+    @Query() query: ItemsQueryDto
   ): Promise<CartItemDto[]> {
     const items = await this.cartsService.findAllCartItemsByCartIdAndStatus(
       cartId,

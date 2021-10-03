@@ -28,17 +28,20 @@ export class CartsService {
     private readonly productsService: ProductsService
   ) {}
 
-  findOpenedCartsWithItems(itemsStatus?: CartItemStatus): Promise<Cart[]> {
-    return this.cartsRepository.findAllWithItemsByItemsStatus(itemsStatus);
+  findOpenedCartsWithItems(): Promise<Cart[]> {
+    return this.cartsRepository.find({ isClosed: false });
   }
 
-  async findCartByIdWithItems(id: number): Promise<Cart> {
-    const cart = await this.cartsRepository.findOne(id, {
-      relations: ['items'],
-    });
+  async findCartByIdWithItems(
+    cartId: number,
+    itemsStatus?: CartItemStatus
+  ): Promise<Cart> {
+    const cart = await this.cartsRepository.findByIdWithItemsWithItemsStatus(
+      itemsStatus
+    );
 
     if (cart === undefined) {
-      throw new NotFoundException(`Cart: ${id}`);
+      throw new NotFoundException(`Cart: ${cartId}`);
     }
 
     return cart;
