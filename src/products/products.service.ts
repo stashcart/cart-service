@@ -100,4 +100,8 @@ export class ProductsService {
 
     return this.patch(product, patchProductDto);
   }
+
+  async deleteById(id: number): Promise<void> {
+    await this.productsRepository.delete(id);
+  }
 }

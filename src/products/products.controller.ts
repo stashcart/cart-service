@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { PatchProductRequestDto } from './dto/patch-product.request.dto';
 import { ProductDto } from './dto/product.dto';
@@ -31,5 +31,10 @@ export class ProductsController {
       patchProductRequestDto
     );
     return new ProductDto(product);
+  }
+
+  @Delete(':id')
+  deleteById(@Param('id') id: number): Promise<void> {
+    return this.productsService.deleteById(id);
   }
 }
