@@ -176,8 +176,8 @@ export class CartsService {
   ): Promise<void> {
     const item = await this.findCartItemByIdAndCartId(cartItemId, cartId);
 
-    if (item.status !== CartItemStatus.PENDING) {
-      throw new BadRequestException("Can't delete approved/rejected item");
+    if (item.status === CartItemStatus.REJECTED) {
+      throw new BadRequestException("Can't delete rejected item");
     }
 
     if (

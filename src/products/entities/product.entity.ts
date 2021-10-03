@@ -15,7 +15,7 @@ export class Product {
   @Column({ unique: true })
   url!: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'float', nullable: true })
   price?: number;
 
   @Column({ nullable: true })
