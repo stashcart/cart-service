@@ -19,10 +19,6 @@ import { AmqpService } from './amqp.service';
             name: 'profile',
             type: 'topic',
           },
-          {
-            name: 'user',
-            type: 'topic',
-          },
         ],
       }),
     }),
