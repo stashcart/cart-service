@@ -5,6 +5,7 @@ import { Cart } from '../entities/cart.entity';
 @EntityRepository(Cart)
 export class CartsRepository extends Repository<Cart> {
   async findByIdWithItemsWithItemsStatus(
+    id: number,
     itemsStatus?: CartItemStatus
   ): Promise<Cart | undefined> {
     const itemsJoinCondition: [string | undefined, ObjectLiteral | undefined] =
@@ -19,7 +20,7 @@ export class CartsRepository extends Repository<Cart> {
       .leftJoinAndSelect('itemsProduct.store', 'itemsProductStore')
       .leftJoinAndSelect('cart.owner', 'owner')
       .leftJoinAndSelect('cart.store', 'store')
-      .where('cart.isClosed = false')
+      .where('cart.id = :id', { id })
       .getOne();
   }
 }

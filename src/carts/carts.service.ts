@@ -37,6 +37,7 @@ export class CartsService {
     itemsStatus?: CartItemStatus
   ): Promise<Cart> {
     const cart = await this.cartsRepository.findByIdWithItemsWithItemsStatus(
+      cartId,
       itemsStatus
     );
 
