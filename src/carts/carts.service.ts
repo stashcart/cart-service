@@ -28,8 +28,11 @@ export class CartsService {
     private readonly productsService: ProductsService
   ) {}
 
-  findOpenedCartsWithItems(): Promise<Cart[]> {
-    return this.cartsRepository.find({ isClosed: false });
+  findOpenedCartsByOwnerId(ownerId?: string): Promise<Cart[]> {
+    return this.cartsRepository.find({
+      isClosed: false,
+      owner: whitelist({ id: ownerId }),
+    });
   }
 
   async findCartByIdWithItems(
