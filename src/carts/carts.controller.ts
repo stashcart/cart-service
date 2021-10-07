@@ -131,8 +131,8 @@ export class CartsController {
   ): Promise<CartItemDto> {
     const item = await this.cartsService.setCartItemStatus({
       cartId,
-      cartItemId: itemId,
-      ownerId: userId,
+      itemId,
+      itemOwnerId: userId,
       status: CartItemStatus.APPROVED,
     });
     return new CartItemDto(item);
@@ -147,8 +147,8 @@ export class CartsController {
   ): Promise<CartItemDto> {
     const item = await this.cartsService.setCartItemStatus({
       cartId,
-      cartItemId: itemId,
-      ownerId: userId,
+      itemId,
+      itemOwnerId: userId,
       status: CartItemStatus.REJECTED,
     });
     return new CartItemDto(item);

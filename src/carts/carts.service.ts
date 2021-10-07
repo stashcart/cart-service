@@ -204,18 +204,18 @@ export class CartsService {
 
   async setCartItemStatus({
     cartId,
-    cartItemId,
-    ownerId,
+    itemId,
+    itemOwnerId,
     status,
   }: {
     cartId: number;
-    cartItemId: number;
-    ownerId?: string;
+    itemId: number;
+    itemOwnerId?: string;
     status: CartItemStatus;
   }): Promise<CartItem> {
-    const item = await this.findCartItemByIdAndCartId(cartItemId, cartId);
+    const item = await this.findCartItemByIdAndCartId(itemId, cartId);
 
-    if (!this.isCartOwnerOrUndefined(item.cart, ownerId)) {
+    if (!this.isCartOwnerOrUndefined(item.cart, itemOwnerId)) {
       throw new ForbiddenException('Only cart owner can approve/reject item');
     }
 
