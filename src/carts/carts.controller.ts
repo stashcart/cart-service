@@ -9,8 +9,8 @@ import {
   Query,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { OnBehalfOf } from 'src/_common/decorators/on-behalf-of.decorator';
-import { ApiOnBehalfOf } from 'src/_common/decorators/swagger/api.on-behalf-of.decorator';
+import { UserId } from 'src/_common/decorators/user-id.decorator';
+import { ApiUserId } from 'src/_common/decorators/swagger/api.user-id.decorator';
 import { CartsService } from './carts.service';
 import { AddCartItemRequestDto } from './dto/add-cart-item.request.dto';
 import { CartItemDto } from './dto/cart-item.dto';
@@ -49,11 +49,11 @@ export class CartsController {
     return new CartDto(cart);
   }
 
-  @ApiOnBehalfOf()
+  @ApiUserId()
   @Post()
   async create(
     @Body() { ownerId, ...createCartRequestDto }: CreateCartRequestDto,
-    @OnBehalfOf() userId?: string
+    @UserId() userId?: string
   ): Promise<CartDto> {
     const cart = await this.cartsService.createCart({
       ...createCartRequestDto,
@@ -62,12 +62,12 @@ export class CartsController {
     return new CartDto(cart);
   }
 
-  @ApiOnBehalfOf()
+  @ApiUserId()
   @Patch(':id')
   async patchCart(
     @Param('id') id: number,
     @Body() patchCartRequestDto: PatchCartRequestDto,
-    @OnBehalfOf() userId?: string
+    @UserId() userId?: string
   ): Promise<CartDto> {
     const cart = await this.cartsService.patchCart(
       id,
@@ -77,21 +77,18 @@ export class CartsController {
     return new CartDto(cart);
   }
 
-  @ApiOnBehalfOf()
+  @ApiUserId()
   @Post(':id/close')
-  closeCart(
-    @Param('id') id: number,
-    @OnBehalfOf() userId?: string
-  ): Promise<void> {
+  closeCart(@Param('id') id: number, @UserId() userId?: string): Promise<void> {
     return this.cartsService.closeCart(id, userId);
   }
 
-  @ApiOnBehalfOf()
+  @ApiUserId()
   @Post(':cartId/items')
   async addItem(
     @Param('cartId') cartId: number,
     @Body() { customerId, ...addCartItemRequestDto }: AddCartItemRequestDto,
-    @OnBehalfOf() userId?: string
+    @UserId() userId?: string
   ): Promise<CartItemDto> {
     const item = await this.cartsService.addItemToCart(cartId, {
       ...addCartItemRequestDto,
@@ -100,12 +97,12 @@ export class CartsController {
     return new CartItemDto(item);
   }
 
-  @ApiOnBehalfOf()
+  @ApiUserId()
   @Delete(':cartId/items/:itemId')
   deleteItemFromCart(
     @Param('cartId') cartId: number,
     @Param('itemId') itemId: number,
-    @OnBehalfOf() userId?: string
+    @UserId() userId?: string
   ): Promise<void> {
     return this.cartsService.deleteItemFromCart(cartId, itemId, userId);
   }
@@ -122,12 +119,12 @@ export class CartsController {
     return items.map((item) => new CartItemDto(item));
   }
 
-  @ApiOnBehalfOf()
+  @ApiUserId()
   @Post(':cartId/items/:itemId/approve')
   async approveCartItem(
     @Param('cartId') cartId: number,
     @Param('itemId') itemId: number,
-    @OnBehalfOf() userId?: string
+    @UserId() userId?: string
   ): Promise<CartItemDto> {
     const item = await this.cartsService.setCartItemStatus({
       cartId,
@@ -138,12 +135,12 @@ export class CartsController {
     return new CartItemDto(item);
   }
 
-  @ApiOnBehalfOf()
+  @ApiUserId()
   @Post(':cartId/items/:itemId/reject')
   async rejectCartItem(
     @Param('cartId') cartId: number,
     @Param('itemId') itemId: number,
-    @OnBehalfOf() userId?: string
+    @UserId() userId?: string
   ): Promise<CartItemDto> {
     const item = await this.cartsService.setCartItemStatus({
       cartId,

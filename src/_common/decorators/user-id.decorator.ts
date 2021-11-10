@@ -1,17 +1,17 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 
-export const ON_BEHALF_OF = 'on-behalf-of';
+export const X_USER_ID = 'x-user-id';
 
 /**
  * Returns user id on whose behalf the request is being made
  *
  * @example
  * .@Get()
- * async find(@OnBehalfOf() userId?: string) {}
+ * async find(@UserId() userId?: string) {}
  */
-export const OnBehalfOf = createParamDecorator(
+export const UserId = createParamDecorator(
   (data: unknown, ctx: ExecutionContext) => {
     const request = ctx.switchToHttp().getRequest();
-    return request.headers['on-behalf-of'];
+    return request.headers[X_USER_ID];
   }
 );
